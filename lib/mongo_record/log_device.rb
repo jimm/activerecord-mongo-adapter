@@ -75,6 +75,10 @@ module MongoRecord
     # grow above :size. If you leave :size nil then it will be
     # +DEFAULT_CAP_SIZE+.
     #
+    # <code>:console</code> - Optional. Specifies an IO instance (for example,
+    # $stdout, $stderr, or an open file) that will receive copies of each log
+    # message.
+    #
     # Note: once a capped collection has been created, you can't redefine the
     # size or max falues for that collection. To do so, you must drop and
     # recreate (or let a LogDevice object recreate) the collection.
@@ -83,6 +87,7 @@ module MongoRecord
       options[:size] ||= DEFAULT_CAP_SIZE
       options[:size] = DEFAULT_CAP_SIZE if options[:size] <= 0
       options[:capped] = true
+      @console = options.delete[:echo]
 
       # It's OK to call createCollection if the collection already exists.
       # Size and max won't change, though.
@@ -91,18 +96,11 @@ module MongoRecord
       # does not have normal keys and returns collection objects as the value
       # of all unknown names.
       self.class.connection.createCollection(@collection_name, options)
-
-      # If we are running outside of the cloud, echo all log messages to
-      # $stderr. If app_context is nil we are outside the cloud, too, but
-      # we don't write to the console because if app_context is null then
-      # we are probably running unit tests.
-      app_context = $scope['__instance__']
-      @console = app_context != nil && app_context.getEnvironmentName() == nil
     end
 
     # Write a log message to the database. We save the message and a timestamp.
     def write(str)
-      $stderr.puts str if @console
+      @console.puts str if @console
       self.class.connection[@collection_name].save({:time => Time.now, :msg => str})
     end
 
