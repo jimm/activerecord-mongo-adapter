@@ -87,7 +87,7 @@ module MongoRecord
       options[:size] ||= DEFAULT_CAP_SIZE
       options[:size] = DEFAULT_CAP_SIZE if options[:size] <= 0
       options[:capped] = true
-      @console = options.delete[:echo]
+      @console = options.delete(:echo)
 
       # It's OK to call createCollection if the collection already exists.
       # Size and max won't change, though.
@@ -95,13 +95,13 @@ module MongoRecord
       # Note we can't use the name "create_collection" because a DB JSObject
       # does not have normal keys and returns collection objects as the value
       # of all unknown names.
-      self.class.connection.createCollection(@collection_name, options)
+      self.class.connection.create_collection(@collection_name, options)
     end
 
     # Write a log message to the database. We save the message and a timestamp.
     def write(str)
       @console.puts str if @console
-      self.class.connection[@collection_name].save({:time => Time.now, :msg => str})
+      self.class.connection.collection(@collection_name).insert({:time => Time.now, :msg => str})
     end
 
     # Close the log. This method is a sham. Nothing happens. You may
