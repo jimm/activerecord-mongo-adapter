@@ -9,20 +9,6 @@ class MongoRecordTest < ActiveSupport::TestCase
     load "#{File.join(File.dirname(__FILE__), 'reload_data.rb')}"
   end
 
-  test "can connect to database" do
-    assert_not_nil $db
-    list = $db.collection_names
-    assert_not_nil list
-    assert_kind_of Array, list
-  end
-
-  test "can see database names" do
-    list = $mongo.database_names
-    assert_not_nil list
-    assert list.size > 0
-    assert list.include?('admin')
-  end
-
   test "count" do
     assert_equal 1, User.count
     assert_equal 3, Product.count
