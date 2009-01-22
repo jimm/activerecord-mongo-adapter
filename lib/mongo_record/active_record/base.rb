@@ -142,18 +142,20 @@ module ActiveRecord
       #
       # Note: Person.count(:all) will not work because it will use :all as the condition.  Use Person.count instead.
       def count(*args)
+        return collection.count() if args == nil || (args.respond_to?(:empty?) && args.empty?)
+
         # Ignore first arg if it is not a Hash
         a = self.respond_to?(:construct_count_options_from_legacy_args) ?
             construct_count_options_from_legacy_args(*args) :
             construct_count_options_from_args(*args)
         column_name, options = *a
-        find_every(options).count()
+        criteria = criteria_from(options[:conditions]).merge(where_func(options[:where]))
+        collection.count(criteria)
       end
 
       # Returns the result of an SQL statement that should only include a COUNT(*) in the SELECT part.
       #   Product.count_by_sql "SELECT COUNT(*) FROM sales s, customers c WHERE s.customer_id = c.id"
       def count_by_sql(sql)
-        count(sql)
         sql =~ /.*\bwhere\b(.*)/i
         count(:conditions => $1 || "")
       end
@@ -164,16 +166,20 @@ module ActiveRecord
       # for looping over a collection where each element require a number of aggregate values. Like the DiscussionBoard
       # that needs to list both the number of posts and comments.
       def increment_counter(counter_name, id)
-        rec = collection.find({:_id => id}, :limit => 1).next_object
-        rec[counter_name] += 1
-        collection.insert(rec)
+        sel = {:_id => id}
+        rec = collection.find(sel, :limit => 1).next_object
+        raise "counter named \"#{counter_name}\" was not found" unless rec
+        rec[counter_name.to_s] += 1
+        collection.replace(sel, rec)
       end
 
       # Works like increment_counter, but decrements instead.
       def decrement_counter(counter_name, id)
-        rec = collection.find({:_id => id}, :limit => 1).next_object
-        rec[counter_name] -= 1
-        collection.insert(rec)
+        sel = {:_id => id}
+        rec = collection.find(sel, :limit => 1).next_object
+        raise "counter named \"#{counter_name}\" was not found" unless rec
+        rec[counter_name.to_s] -= 1
+        collection.replace(sel, rec)
       end
 
       # Defines the primary key field -- can be overridden in subclasses. Overwriting will negate any effect of the
@@ -221,12 +227,8 @@ module ActiveRecord
 
       def find_every(options)
         criteria = criteria_from(options[:conditions]).merge(where_func(options[:where]))
-        fields = fields_from(options[:select])
-        db_cursor = collection.find(criteria, :fields => fields)
-        db_cursor.limit(options[:limit].to_i) if options[:limit]
-        db_cursor.skip(options[:offset].to_i) if options[:offset]
-        sort_by = sort_by_from(options[:order]) if options[:order]
-        db_cursor.sort(sort_by) if sort_by
+        options = rails_to_mongo_find_options(options)
+        db_cursor = collection.find(criteria, options)
         MongoRecord::Cursor.new(db_cursor, self)
       end
 
@@ -234,10 +236,8 @@ module ActiveRecord
         ids = ids.to_a.flatten.compact.uniq
         criteria = criteria_from(options[:conditions]).merge(where_func(options[:where]))
         criteria[:_id] = ids_clause(ids)
-        fields = fields_from(options[:select])
-        db_cursor = collection.find(criteria, :fields => fields)
-        sort_by = sort_by_from(options[:order]) if options[:order]
-        db_cursor.sort(sort_by) if sort_by
+        options = rails_to_mongo_find_options(options)
+        db_cursor = collection.find(criteria, options)
         ids.length == 1 ? instantiate(db_cursor.next_object) : MongoRecord::Cursor.new(db_cursor, self)
       end
 
@@ -335,6 +335,17 @@ module ActiveRecord
         end
         return nil unless sort_by.length > 0
         sort_by
+      end
+
+      # Turns Rails find options into XGen::Mongo::Driver::Collection#find
+      # options.
+      def rails_to_mongo_find_options(options)
+        mopts = {}
+        mopts[:fields] = fields_from(options[:select]) if options[:select]
+        mopts[:sort] = sort_by_from(options[:order]) if options[:order]
+        mopts[:limit] = options[:limit] if options[:limit]
+        mopts[:offset] = options[:offset] if options[:offset]
+        mopts
       end
 
       # Turns "asc" into 1, "desc" into -1, and other values into 1 or -1.
