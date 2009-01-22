@@ -44,4 +44,12 @@ class PKFactoryTest < ActiveSupport::TestCase
     assert_kind_of XGen::Mongo::Driver::ObjectID, row['_id']
   end
 
+  test "deletes id symbol key with nil value and id string key" do
+    row = {:_id => nil, '_id' => @known_id}
+    @pkf.create_pk(row)
+    assert_nil row[:_id]
+    assert_equal @known_id, row['_id']
+    assert_kind_of XGen::Mongo::Driver::ObjectID, row['_id']
+  end
+
 end
