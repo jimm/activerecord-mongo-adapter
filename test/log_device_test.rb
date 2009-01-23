@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'mongo_record/log_device'
 
 class LoggerTest < ActiveSupport::TestCase
 
