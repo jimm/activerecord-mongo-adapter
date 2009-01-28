@@ -10,10 +10,14 @@ class MongoRecordTest < ActiveSupport::TestCase
   end
 
   test "can see database names" do
+    $db.collection('ar-mongo-adapter').insert('a' => 1)
+
     list = $mongo.database_names
     assert_not_nil list
     assert list.size > 0
     assert list.include?('admin')
+
+    $db.collection('ar-mongo-adapter').clear
   end
 
 end
