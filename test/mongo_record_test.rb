@@ -14,7 +14,16 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_equal 3, Product.count
     assert_equal 2, Product.count(:conditions => "title in ('Book 01', 'Book 02')")
     assert_equal 2, Product.count(:all, :conditions => "title in ('Book 01', 'Book 02')")
+  end
+
+  test "count returns 0 when collection does not exist" do
+    Order.collection.db.drop_collection('orders')
     assert_equal 0, Order.count
+
+    # Make sure we also return 0 when the collection exists but there are no
+    # records.
+    Product.delete_all
+    assert_equal 0, Product.count
   end
 
   test "count by sql" do

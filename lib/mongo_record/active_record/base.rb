@@ -151,6 +151,15 @@ module ActiveRecord
         column_name, options = *a
         criteria = criteria_from(options[:conditions]).merge(where_func(options[:where]))
         collection.count(criteria)
+      rescue => ex
+        if ex.to_s =~ /Error with count command.*ns does not exist/
+              # Return 0 because we will graciously assume that we are being
+              # called from a subclass that has been initialized properly, and
+              # is therefore mentioned in the schema.
+          0
+        else
+          raise ex
+        end
       end
 
       # Returns the result of an SQL statement that should only include a COUNT(*) in the SELECT part.
