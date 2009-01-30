@@ -1,6 +1,5 @@
 require 'rubygems'
-require 'active_support'
-require 'active_support/test_case'
+# require 'active_support'
 require 'test/unit'
 require 'mongo'
 require 'mongo_record/pk_factory'

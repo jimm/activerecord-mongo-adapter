@@ -3,20 +3,20 @@ require 'active_record'
 require 'mongo_record'
 Dir[File.join(File.dirname(__FILE__), 'models/*.rb')].each { |f| require f }
 
-class MongoRecordTest < ActiveSupport::TestCase
+class MongoRecordTest < Test::Unit::TestCase
 
   def setup
     load "#{File.join(File.dirname(__FILE__), 'reload_data.rb')}"
   end
 
-  test "count" do
+  def test_count
     assert_equal 1, User.count
     assert_equal 3, Product.count
     assert_equal 2, Product.count(:conditions => "title in ('Book 01', 'Book 02')")
     assert_equal 2, Product.count(:all, :conditions => "title in ('Book 01', 'Book 02')")
   end
 
-  test "count returns 0 when collection does not exist" do
+  def test_count_returns_0_when_collection_does_not_exist
     Order.collection.db.drop_collection('orders')
     assert_equal 0, Order.count
 
@@ -26,12 +26,12 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_equal 0, Product.count
   end
 
-  test "count by sql" do
+  def test_count_by_sql
     assert_equal 2, Product.count_by_sql("select count(*) from products where title in ('Book 01', 'Book 02')")
     assert_equal 3, Product.count_by_sql("select count(*) from products")
   end
 
-  test "find" do
+  def test_find
     p = Product.find_by_title('Book 01')
     assert_not_nil p
     assert_equal 'Book 01', p.title
@@ -60,7 +60,7 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_equal 1, a.to_a.length
   end
 
-  test "find by id" do
+  def test_find_by_id
     p = Product.find(:first, :conditions => "title = 'Book 03'")
     pid = p.id
 
@@ -76,7 +76,7 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_equal "Book 03", p.title
   end
 
-  test "sql like" do
+  def test_sql_like
     a = Product.find(:all, :conditions => "title like 'Book%'")
     assert_not_nil a
     assert_equal 3, a.to_a.length
@@ -97,7 +97,7 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_equal 3, a.to_a.length
   end
 
-  test "sql in" do
+  def test_sql_in
     a = Product.find(:all, :conditions => "title in ('Book 01', 'Book 02', 'Book 03')")
     assert_not_nil a
     assert_equal 3, a.to_a.length
@@ -119,7 +119,7 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_equal 3, a.to_a.length
   end
 
-  test "order and limit" do
+  def test_order_and_limit
     a = Product.find(:all, :order => 'title desc')
     obj_array = a.to_a
     assert_equal 3, obj_array.length
@@ -133,7 +133,7 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_equal "Book 03", p.title
   end
 
-  test "has many" do
+  def test_has_many
     o = Order.new
     3.times { |i|
       p = Product.find_by_title("Book 0#{i+1}")
@@ -153,7 +153,7 @@ class MongoRecordTest < ActiveSupport::TestCase
     }
   end
 
-  test "delete" do
+  def test_delete
     p = Product.find_by_title('Book 01')
     i = p.id
     Product.delete(p.id)
@@ -161,7 +161,7 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_nil Product.find_by_title('Book 01')
   end
 
-  test "delete all" do
+  def test_delete_all
     Product.delete_all("title in ('Book 01', 'Book 02')")
     assert_equal 1, Product.count
 
@@ -169,7 +169,7 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_equal 0, Product.count
   end
 
-  test "increment decrement counter" do
+  def test_increment_decrement_counter
     li = LineItem.new(:quantity => 3, :total_price => 1.5)
     li.save
 
@@ -180,12 +180,12 @@ class MongoRecordTest < ActiveSupport::TestCase
     assert_equal 3, LineItem.find(li.id).quantity
   end
 
-  test "columns" do
+  def test_columns
     sorted_names = LineItem.columns.collect { |c| c.name }.sort
     assert_equal sorted_names, %w(_id order_id product_id quantity total_price)
   end
 
-  test "find by sql raises exception" do
+  def test_find_by_sql_raises_exception
     begin
       Product.find_by_sql('blargh')
       fail('expected "not implemented" exception')
@@ -194,7 +194,7 @@ class MongoRecordTest < ActiveSupport::TestCase
     end
   end
 
-  test "update all raises exception" do
+  def test_update_all_raises_exception
     begin
       Product.update_all('blargh')
       fail('expected "not implemented" exception')
@@ -203,20 +203,20 @@ class MongoRecordTest < ActiveSupport::TestCase
     end
   end
 
-  test "connection" do
+  def test_connection
     c = Product.connection
     assert_not_nil c
     assert_kind_of ActiveRecord::ConnectionAdapters::MongoPseudoConnection, c
   end
 
-  test "collection" do
+  def test_collection
     c = Product.collection
     assert_not_nil c
     assert_kind_of XGen::Mongo::Driver::Collection, c
     assert_equal 'products', c.name
   end
 
-  test "collection info" do
+  def test_collection_info
     ci = Product.collection_info
     assert_not_nil ci
     p = ci['products']

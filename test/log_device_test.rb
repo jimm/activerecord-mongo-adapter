@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'mongo_record/log_device'
 
-class LoggerTest < ActiveSupport::TestCase
+class LoggerTest < Test::Unit::TestCase
 
   MAX_RECS = 3
 
@@ -18,7 +18,7 @@ class LoggerTest < ActiveSupport::TestCase
 
   # We really don't have to test much more than this. We can trust that Mongo
   # works properly.
-  test "max records enforced" do
+  def test_max_records_enforced
     assert_equal $db.name, MongoRecord::LogDevice.connection.name
     MAX_RECS.times { |i|
       @logger.debug("test message #{i+1}")
