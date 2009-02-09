@@ -6,7 +6,11 @@ db_config = File.open(File.join(RAILS_ROOT, 'config/database.yml'), 'r') {|f|
 db_config = db_config[RAILS_ENV]
 
 if db_config['adapter'] == 'mongo'
-  require 'mongo'
+  begin
+    require 'mongo >= 0.5.4'
+  rescue
+    require 'mongo'
+  end
   require 'mongo_record/pk_factory'
   require 'mongo_record'
   $db = XGen::Mongo::Driver::Mongo.new(db_config['host'], db_config['port']).db(db_config['database'], :pk => MongoRecord::PKFactory.new)
