@@ -176,7 +176,7 @@ module ActiveRecord
       # that needs to list both the number of posts and comments.
       def increment_counter(counter_name, id)
         sel = {:_id => id}
-        rec = collection.find_first(sel, :limit => 1)
+        rec = collection.find_first(sel)
         raise "counter named \"#{counter_name}\" was not found" unless rec
         rec[counter_name.to_s] += 1
         collection.replace(sel, rec)
@@ -185,7 +185,7 @@ module ActiveRecord
       # Works like increment_counter, but decrements instead.
       def decrement_counter(counter_name, id)
         sel = {:_id => id}
-        rec = collection.find_first(sel, :limit => 1)
+        rec = collection.find_first(sel)
         raise "counter named \"#{counter_name}\" was not found" unless rec
         rec[counter_name.to_s] -= 1
         collection.replace(sel, rec)
@@ -230,7 +230,7 @@ module ActiveRecord
       def find_initial(options)
         criteria = criteria_from(options[:conditions]).merge(where_func(options[:where]))
         fields = fields_from(options[:select])
-        row = collection.find_first(criteria, :fields => fields, :limit => 1)
+        row = collection.find_first(criteria, :fields => fields)
         (row.nil? || row['_id'] == nil) ? nil : self.send(:instantiate, row)
       end
 
@@ -246,12 +246,10 @@ module ActiveRecord
         criteria = criteria_from(options[:conditions]).merge(where_func(options[:where]))
         criteria[:_id] = ids_clause(ids)
         options = rails_to_mongo_find_options(options)
-        db_cursor = collection.find(criteria, options)
         if ids.length == 1
-          row = db_cursor.next_object
-          db_cursor.close
-          instantiate(row)
+          instantiate(collection.find_first(criteria, options))
         else
+          db_cursor = collection.find(criteria, options)
           MongoRecord::Cursor.new(db_cursor, self)
         end
       end
