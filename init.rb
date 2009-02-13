@@ -7,7 +7,7 @@ db_config = db_config[RAILS_ENV]
 
 if db_config['adapter'] == 'mongo'
   begin
-    require 'mongo >= 0.5.4'
+    require 'mongo'
   rescue
     require 'mongo'
   end
