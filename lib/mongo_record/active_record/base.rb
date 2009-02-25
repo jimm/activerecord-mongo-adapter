@@ -107,7 +107,7 @@ module ActiveRecord
         collection.remove(MongoRecord::SQL::Parser.parse_where(conditions, true) || {})
       end
 
-      # Count operates using two different approaches. 
+      # Count operates using two different approaches.
       #
       # * Count all: By not passing any parameters to count, it will return a count of all the rows for the model.
       # * Count using options will find the row count matched by the options used.
@@ -136,7 +136,7 @@ module ActiveRecord
       # Examples for count with options:
       #   Person.count(:conditions => "age > 26")
       #   Person.count(:conditions => "age > 26 AND job.salary > 60000", :include => :job) # because of the named association, it finds the DISTINCT count using LEFT OUTER JOIN.
-      #   Person.count(:conditions => "age > 26 AND job.salary > 60000", :joins => "LEFT JOIN jobs on jobs.person_id = person.id") # finds the number of rows matching the conditions and joins. 
+      #   Person.count(:conditions => "age > 26 AND job.salary > 60000", :joins => "LEFT JOIN jobs on jobs.person_id = person.id") # finds the number of rows matching the conditions and joins.
       #   Person.count('id', :conditions => "age > 26") # Performs a COUNT(id)
       #   Person.count(:all, :conditions => "age > 26") # Performs a COUNT(*) (:all is an alias for '*')
       #
@@ -152,7 +152,7 @@ module ActiveRecord
         criteria = criteria_from(options[:conditions]).merge(where_func(options[:where]))
         collection.count(criteria)
       rescue => ex
-        if ex.to_s =~ /Error with count command.*ns does not exist/
+        if ex.to_s =~ /Error with count command.*ns missing/
               # Return 0 because we will graciously assume that we are being
               # called from a subclass that has been initialized properly, and
               # is therefore mentioned in the schema.
