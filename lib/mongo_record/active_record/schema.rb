@@ -19,7 +19,7 @@ module ActiveRecord
   # The Mongo implementation of ActiveRecord needs to read the file named by
   # ENV['SCHEMA'] or, if that is not defined, db/schema.rb to get the database
   # schema the application wants to use, because Mongo is schema-free.
-  # 
+  #
   # Here we override some ActiveRecord::Schema methods here that get used when
   # reading the schema file.
   #
@@ -47,7 +47,7 @@ module ActiveRecord
       end
 
       def add_index(table_name, column_name, options = {})
-        ActiveRecord::Base.connection.db.collection(table_name).create_index(column_name, column_name)
+        ActiveRecord::Base.connection.db.collection(table_name).create_index(column_name)
       end
     end
 
