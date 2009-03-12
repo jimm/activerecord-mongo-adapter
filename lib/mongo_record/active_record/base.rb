@@ -14,6 +14,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #++
 
+require 'mongo/types/code'
 require 'mongo_record/sql'
 require 'mongo_record/objectid'
 require 'mongo_record/cursor'
@@ -314,7 +315,7 @@ module ActiveRecord
       # Returns a hash useable by Mongo for applying +func+ on the db
       # server. +func+ must be a JavaScript function in a string.
       def where_func(func)    # :nodoc:
-        func ? {:$where => func} : {}
+        func ? {:$where => Code.new(func)} : {}
       end
 
       def fields_from(a) # :nodoc:
