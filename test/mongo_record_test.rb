@@ -1,3 +1,4 @@
+$LOAD_PATH[0,0] = File.join(File.dirname(__FILE__), '..', 'lib')
 require 'test_helper'
 require 'active_record'
 require 'mongo_record'
