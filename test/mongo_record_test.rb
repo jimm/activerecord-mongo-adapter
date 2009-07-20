@@ -234,16 +234,20 @@ class MongoRecordTest < Test::Unit::TestCase
     u = User.new
     u.name = "foo"
     assert u.save
+    oid = u.id
 
     assert_equal 1, User.count
 
     u_prime = User.find(:first)
+    assert_equal(oid, u_prime.id)
     u_prime.name = "bar"
     assert u_prime.save
+    assert_equal(oid, u_prime.id)
 
     assert_equal 1, User.count
 
     v = User.find(:first)
+    assert_equal(oid, v.id)
     assert_equal "bar", v.name
   end
 
