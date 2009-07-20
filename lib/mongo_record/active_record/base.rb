@@ -409,13 +409,13 @@ module ActiveRecord
     # Updates the associated record with values matching those of the instance attributes.
     # Returns the number of affected rows.
     def update_without_callbacks
-      self.class.collection.insert(to_mongo_value)
+      self.class.collection.save(to_mongo_value)
     end
 
     # Creates a record with values matching those of the instance attributes
     # and returns its id.
     def create_without_callbacks
-      row = self.class.collection.insert(to_mongo_value)
+      row = self.class.collection.save(to_mongo_value)
       self.id = row['_id']
       @new_record = false
       id

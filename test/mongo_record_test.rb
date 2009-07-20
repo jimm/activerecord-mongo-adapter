@@ -226,4 +226,25 @@ class MongoRecordTest < Test::Unit::TestCase
     assert_equal %w(_id description image_url price title), p.columns.collect{|col| col.name}.sort
   end
 
+  def test_update
+    User.delete_all
+
+    assert_equal 0, User.count
+
+    u = User.new
+    u.name = "foo"
+    assert u.save
+
+    assert_equal 1, User.count
+
+    u_prime = User.find(:first)
+    u_prime.name = "bar"
+    assert u_prime.save
+
+    assert_equal 1, User.count
+
+    v = User.find(:first)
+    assert_equal "bar", v.name
+  end
+
 end
