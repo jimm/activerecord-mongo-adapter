@@ -415,10 +415,9 @@ module ActiveRecord
     # Creates a record with values matching those of the instance attributes
     # and returns its id.
     def create_without_callbacks
-      row = self.class.collection.save(to_mongo_value)
-      self.id = row['_id']
+      self.id = self.class.collection.save(to_mongo_value)
       @new_record = false
-      id
+      self.id
     end
 
   end
