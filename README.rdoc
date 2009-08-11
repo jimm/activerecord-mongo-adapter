@@ -13,7 +13,7 @@ database.yml file. See below for instructions.
 
 == Installing
 
-As noted above, this plugin requires the "mongo" Ruby Gem, version 0.5.4 or
+As noted above, this plugin requires the "mongo" Ruby Gem, version 0.11 or
 higher.
 
 To add this plugin to your Rails app, move (or link) this directory into your
