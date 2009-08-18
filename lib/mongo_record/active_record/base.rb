@@ -149,7 +149,7 @@ module ActiveRecord
             construct_count_options_from_args(*args)
         column_name, options = *a
         criteria = criteria_from(options[:conditions]).merge(where_func(options[:where]))
-        collection.count(criteria)
+        collection.find(criteria).count()
       rescue => ex
         if ex.to_s =~ /Error with count command.*ns missing/
               # Return 0 because we will graciously assume that we are being
