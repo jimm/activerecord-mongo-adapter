@@ -349,7 +349,7 @@ module ActiveRecord
         sort_by
       end
 
-      # Turns Rails find options into XGen::Mongo::Driver::Collection#find
+      # Turns Rails find options into Mongo::Collection#find
       # options.
       def rails_to_mongo_find_options(options)
         mopts = {}

@@ -17,13 +17,13 @@ require 'mongo/types/objectid'
 class String
   # Convert this String to an ObjectID.
   def to_oid
-    XGen::Mongo::Driver::ObjectID.from_string(self)
+    Mongo::ObjectID.from_string(self)
   end
 end
 
 # Normally, you don't have to worry about ObjectIDs. You can treat _id values
 # as strings and this code will convert them for you.
-class XGen::Mongo::Driver::ObjectID
+class Mongo::ObjectID
   # Convert this object to an ObjectId.
   def to_oid
     self
@@ -38,7 +38,7 @@ class XGen::Mongo::Driver::ObjectID
   # Tells Marshal how to load this object. This was used in code that stored
   # sessions in Mongo. It is unused for now.
   def marshal_load(oid)
-    XGen::Mongo::Driver::ObjectID.from_string(oid)
+    Mongo::ObjectID.from_string(oid)
   end
 end
 

@@ -213,7 +213,7 @@ class MongoRecordTest < Test::Unit::TestCase
   def test_collection
     c = Product.collection
     assert_not_nil c
-    assert_kind_of XGen::Mongo::Driver::Collection, c
+    assert_kind_of Mongo::Collection, c
     assert_equal 'products', c.name
   end
 

@@ -12,12 +12,12 @@ if db_config['adapter'] == 'mongo'
     require 'mongo'
   end
   require 'mongo_record/pk_factory'
-  
-  $db = XGen::Mongo::Driver::Mongo.new(db_config['host'], db_config['port']).db(db_config['database'], :pk => MongoRecord::PKFactory.new)
+
+  $db = Mongo::Mongo.new(db_config['host'], db_config['port']).db(db_config['database'], :pk => MongoRecord::PKFactory.new)
   # require this after the DB is set up, otherwise ActiveRecord::Base.connection.db does not
   # get populated
-  require 'mongo_record' 
-  
+  require 'mongo_record'
+
   # Uncomment the following to log to Mongo using a capped collection.
 #   require 'logger'
 #   require 'mongo_record/log_device'

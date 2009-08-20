@@ -5,11 +5,11 @@ class PKFactoryTest < Test::Unit::TestCase
 
   def setup
     @pkf = MongoRecord::PKFactory.new
-    @known_id = XGen::Mongo::Driver::ObjectID.new
+    @known_id = Mongo::ObjectID.new
   end
 
   def test_generates_ObjectIDs
-    assert_kind_of XGen::Mongo::Driver::ObjectID, @pkf.create_pk({})['_id']
+    assert_kind_of Mongo::ObjectID, @pkf.create_pk({})['_id']
   end
 
   def test_generates_unique_ids
@@ -26,7 +26,7 @@ class PKFactoryTest < Test::Unit::TestCase
     row = {'_id' => nil}
     @pkf.create_pk(row)
     assert_not_nil row['_id']
-    assert_kind_of XGen::Mongo::Driver::ObjectID, row['_id']
+    assert_kind_of Mongo::ObjectID, row['_id']
   end
 
   def test_does_not_stomp_on_old_ids_when_id_key_is_symbol
@@ -41,7 +41,7 @@ class PKFactoryTest < Test::Unit::TestCase
     @pkf.create_pk(row)
     assert_nil row[:_id]
     assert_not_nil row['_id']
-    assert_kind_of XGen::Mongo::Driver::ObjectID, row['_id']
+    assert_kind_of Mongo::ObjectID, row['_id']
   end
 
   def test_deletes_id_symbol_key_with_nil_value_and_id_string_key
@@ -49,7 +49,7 @@ class PKFactoryTest < Test::Unit::TestCase
     @pkf.create_pk(row)
     assert_nil row[:_id]
     assert_equal @known_id, row['_id']
-    assert_kind_of XGen::Mongo::Driver::ObjectID, row['_id']
+    assert_kind_of Mongo::ObjectID, row['_id']
   end
 
 end
