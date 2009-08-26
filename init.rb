@@ -13,7 +13,7 @@ if db_config['adapter'] == 'mongo'
   end
   require 'mongo_record/pk_factory'
 
-  $db = Mongo::Mongo.new(db_config['host'], db_config['port']).db(db_config['database'], :pk => MongoRecord::PKFactory.new)
+  $db = Mongo::Connection.new(db_config['host'], db_config['port']).db(db_config['database'], :pk => MongoRecord::PKFactory.new)
   # require this after the DB is set up, otherwise ActiveRecord::Base.connection.db does not
   # get populated
   require 'mongo_record'
