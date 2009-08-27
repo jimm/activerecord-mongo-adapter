@@ -251,4 +251,22 @@ class MongoRecordTest < Test::Unit::TestCase
     assert_equal "bar", v.name
   end
 
+  def test_validation
+    assert_equal 1, User.count
+
+    u = User.new
+    u.name = "foobar"
+    u.save
+    assert u.errors.empty?
+
+    assert_equal 2, User.count
+
+    u = User.new
+    u.password = "foobar"
+    u.save
+    assert !u.errors.empty?
+
+    assert_equal 2, User.count
+  end
+
 end

@@ -85,7 +85,10 @@ module ActiveRecord
       # Transactions are not yet supported by Mongo, so this method simply
       # yields to the given block.
       def transaction(start_db_transaction=true)
-        yield
+        begin
+          yield
+        rescue ActiveRecord::Rollback
+        end
       end
 
       # Enable the query cache within the block. Ignored.
