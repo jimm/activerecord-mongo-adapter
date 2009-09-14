@@ -59,8 +59,11 @@ module ActiveRecord
         @@mongo_connection = ActiveRecord::ConnectionAdapters::MongoPseudoConnection.new(db || $db)
       end
 
-      # Does nothing.
-      def establish_connection(spec = nil); end
+      # Reset the connection to Mongo - this allows Passenger to use a new
+      # connection per process.
+      def establish_connection(spec = nil)
+        @@mongo_connection.db.connect_to_master
+      end
 
       # Return the connection.
       def retrieve_connection; connection; end
